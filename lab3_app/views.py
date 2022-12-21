@@ -1,6 +1,8 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.decorators import action, api_view
+
 from lab3_app.serializers import *
-from lab3_app.models import Game, Publishers, Developers, Genre, Users
+from lab3_app.models import Game, Publishers, Developers, Genre, Users, Library
 from rest_framework import generics, filters, permissions
 from rest_framework.views import APIView, Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -25,9 +27,24 @@ class GameViewSet(viewsets.ModelViewSet):
     API endpoint, который позволяет просматривать и редактировать акции компаний
     """
     # queryset всех пользователей для фильтрации по дате последнего изменения
-    queryset = Game.objects.select_related('publisher').all()
+    queryset = Game.objects.all()
     serializer_class = GameSerializer  # Сериализатор для модели
-    permission_classes = (IsExecutor,)
+
+
+@api_view(['PUT'], )
+def UpdateGameViewSet(request):
+    """
+    API endpoint, который позволяет просматривать и редактировать акции компаний
+    """
+    # queryset всех пользователей для фильтрации по дате последнего изменения
+    if request.method == 'PUT':
+        serializer = GameSerializer(data = request.data)
+        data = {}
+        if serializer.is_valid():
+            serializer.save()
+            data["success"] = "update successful"
+            return Response(data=data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PubViewSet(viewsets.ModelViewSet):
@@ -159,7 +176,7 @@ class CartView(APIView):
         return Response(serializer.data)
 
 
-class CartViewSet(generics.ListCreateAPIView):
+class CartViewSet(viewsets.ModelViewSet):
     """
     API endpoint, который позволяет просматривать и редактировать акции компаний
     """
@@ -168,6 +185,24 @@ class CartViewSet(generics.ListCreateAPIView):
     filter_backends = (filters.SearchFilter,)
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+
+    @action(['post'], detail=True)
+    def delete(self, request, pk = None):
+        try:
+            instance = Cart.objects.get(pk = pk)
+            instance.delete()
+            return Response({'Deleted'})
+        except:
+            return Response({'Not deleted'})
+
+
+
+   # def delete(self, request, pk = None):
+   #      try:
+   #          cart = Cart.objects.get(pk = pk).delete()
+   #          return Response({'Deleted'})
+   #      except:
+   #          return Response({'Not deleted'})
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -178,9 +213,38 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims
         token['login'] = user.login
         token['email'] = user.email
+        token['is_manager'] = user.is_manager;
 
         return token
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+
+class LibView(APIView):
+    def post(self, request):
+        serializer = LibSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class LibViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint, который позволяет просматривать и редактировать акции компаний
+    """
+    # queryset всех пользователей для фильтрации по дате последнего изменения
+    search_fields = ['user_id__id']
+    filter_backends = (filters.SearchFilter,)
+    queryset = Library.objects.all()
+    serializer_class = LibSerializer
+
+    @action(['post'], detail=True)
+    def delete(self, request, pk = None):
+        try:
+            instance = Library.objects.get(pk = pk)
+            instance.delete()
+            return Response({'Deleted'})
+        except:
+            return Response({'Not deleted'})

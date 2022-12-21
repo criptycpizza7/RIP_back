@@ -1,4 +1,4 @@
-from lab3_app.models import Game, Publishers, Developers, Genre, Users, Cart
+from lab3_app.models import Game, Publishers, Developers, Genre, Users, Cart, Library
 from rest_framework import serializers
 
 
@@ -7,7 +7,7 @@ class GameSerializer(serializers.ModelSerializer):
         # Модель, которую мы сериализуем
         model = Game
         # Поля, которые мы сериализуем
-        fields = ["id", "name", "genre", "releasedate", "developer", "publisher", "price"]
+        fields = ["id", "name", "genre", "releasedate", "developer", "publisher", "price", "managed_by"]
 
 
 class PubSerializer(serializers.ModelSerializer):
@@ -29,7 +29,7 @@ class DevSerializer(serializers.ModelSerializer):
 class GameSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
-        fields = ['id', "name", 'genre', "releasedate", "publisher", "developer",  "price"]
+        fields = ['id', "name", 'genre', "releasedate", "publisher", "developer",  "price", "managed_by"]
 
 
 class GenSerializer(serializers.ModelSerializer):
@@ -51,7 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
         # Модель, которую мы сериализуем
         model = Users
         # Поля, которые мы сериализуем
-        fields = ["id", "login", "password", "email"]
+        fields = ["id", "login", "password", "email", "is_manager"]
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -68,7 +68,13 @@ class UserSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = ['user_id', 'game_id']
+        fields = ['pk', 'user_id', 'game_id']
+
+
+class LibSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Library
+        fields = ['pk', 'user_id', 'game_id']
 
 
 '''class RegistrationSerializer(serializers.ModelSerializer):
@@ -80,3 +86,4 @@ class CartSerializer(serializers.ModelSerializer):
             'password' : 
         }
 '''
+

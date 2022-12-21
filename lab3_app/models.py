@@ -32,27 +32,12 @@ class Genre(models.Model):
         ordering = ['name']
 
 
-class Game(models.Model):
-    # id = models.IntegerField(db_column='ID', primary_key = True)  # Field name made lowercase.
-    name = models.CharField(max_length=50)
-    genre = models.ManyToManyField(Genre)
-    releasedate = models.DateField(db_column='releaseDate', blank=True, null=True)  # Field name made lowercase.
-    developer = models.ManyToManyField(Developers)
-    publisher = models.ForeignKey(Publishers, on_delete=models.CASCADE, default = 1)
-    price = models.FloatField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'game'
-
-
 class Users(AbstractUser):
     login = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=100)
     email = models.EmailField(max_length=150, unique=True)
     join_date = models.DateTimeField(auto_now_add=True)
-    activated = models.BooleanField(default=False)
-    activationCode = models.CharField(max_length=6)
+    is_manager = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'login'
     REQUIRED_FIELDS = ['password', 'email']
@@ -69,6 +54,21 @@ class Users(AbstractUser):
         db_table = 'users'
 
 
+class Game(models.Model):
+    # id = models.IntegerField(db_column='ID', primary_key = True)  # Field name made lowercase.
+    name = models.CharField(max_length=50)
+    genre = models.CharField(max_length=50, blank=True, null=True)
+    releasedate = models.DateField(db_column='releaseDate', blank=True, null=True)  # Field name made lowercase.
+    developer = models.CharField(max_length=50, blank=True, null=True)
+    publisher = models.CharField(max_length=50, blank=True, null=True)
+    price = models.FloatField(blank=True, null=True)
+    managed_by = models.BigIntegerField(default=6)
+
+    class Meta:
+        managed = True
+        db_table = 'game'
+
+
 class Cart(models.Model):
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
@@ -76,3 +76,12 @@ class Cart(models.Model):
     class Meta:
         managed = True
         db_table = 'cart'
+
+
+class Library(models.Model):
+    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
+    game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'library'

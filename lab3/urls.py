@@ -21,8 +21,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView, TokenVerifyView,
 )
 
-from lab3_app.views import MyTokenObtainPairView
-
+from lab3_app.views import MyTokenObtainPairView, UpdateGameViewSet
 
 router_games = routers.DefaultRouter()
 router_games.register(r'Games', db_views.GameViewSet)
@@ -30,6 +29,8 @@ router_games.register(r'Publishers', db_views.PubViewSet)
 router_games.register(r'Developers', db_views.DevViewSet)
 router_games.register(r'Genres', db_views.GenViewSet)
 router_games.register(r'Users', db_views.UserViewSet)
+router_games.register(r'Cart', db_views.CartViewSet)
+router_games.register(r'Library', db_views.LibViewSet)
 
 urlpatterns = [
     path('', include(router_games.urls)),
@@ -41,4 +42,5 @@ urlpatterns = [
     path('api/login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('updateGame/', UpdateGameViewSet)
 ]
