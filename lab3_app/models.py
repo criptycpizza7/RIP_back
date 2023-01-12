@@ -1,3 +1,6 @@
+import datetime
+
+import django.utils.timezone
 from django.contrib.auth.models import AbstractUser
 from django.db import models, transaction
 from django.contrib.auth.models import (
@@ -56,13 +59,14 @@ class Users(AbstractUser):
 
 class Game(models.Model):
     # id = models.IntegerField(db_column='ID', primary_key = True)  # Field name made lowercase.
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     genre = models.CharField(max_length=50, blank=True, null=True)
     releasedate = models.DateField(db_column='releaseDate', blank=True, null=True)  # Field name made lowercase.
     developer = models.CharField(max_length=50, blank=True, null=True)
     publisher = models.CharField(max_length=50, blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
     managed_by = models.BigIntegerField(default=6)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         managed = True
@@ -81,6 +85,9 @@ class Cart(models.Model):
 class Library(models.Model):
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
+    payment_date = models.DateField(default=datetime.date.today)
+    is_activated = models.BooleanField(default=False)
+    activation_date = models.DateField(default=datetime.date.today, null=True)
 
     class Meta:
         managed = True

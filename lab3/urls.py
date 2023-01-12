@@ -21,10 +21,11 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView, TokenVerifyView,
 )
 
-from lab3_app.views import MyTokenObtainPairView, UpdateGameViewSet
+from lab3_app.views import MyTokenObtainPairView, GameManAPIView, UpdateGameViewSet
 
 router_games = routers.DefaultRouter()
-router_games.register(r'Games', db_views.GameViewSet)
+router_games.register(r'Games', db_views.GameViewSetUser)
+router_games.register(r'GamesMan', db_views.GameViewSetMan)
 router_games.register(r'Publishers', db_views.PubViewSet)
 router_games.register(r'Developers', db_views.DevViewSet)
 router_games.register(r'Genres', db_views.GenViewSet)
@@ -42,5 +43,6 @@ urlpatterns = [
     path('api/login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('updateGame/', UpdateGameViewSet)
+    path('updateGame/', UpdateGameViewSet),
+    path('getGameByMan/', GameManAPIView.as_view())
 ]

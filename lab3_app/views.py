@@ -1,6 +1,5 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
-
 from lab3_app.serializers import *
 from lab3_app.models import Game, Publishers, Developers, Genre, Users, Library
 from rest_framework import generics, filters, permissions
@@ -19,10 +18,20 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 class IsExecutor(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        return obj.user == request.user
+        print(request.META['HTTP_USERID'])
+        return obj.user_id != request.META['HTTP_USERID']
 
 
-class GameViewSet(viewsets.ModelViewSet):
+class GameViewSetUser(viewsets.ModelViewSet):
+    """
+    API endpoint, который позволяет просматривать и редактировать акции компаний
+    """
+    # queryset всех пользователей для фильтрации по дате последнего изменения
+    queryset = Game.objects.filter(is_deleted = False)
+    serializer_class = GameSerializer  # Сериализатор для модели
+
+
+class GameViewSetMan(viewsets.ModelViewSet):
     """
     API endpoint, который позволяет просматривать и редактировать акции компаний
     """
@@ -68,10 +77,15 @@ class DevViewSet(viewsets.ModelViewSet):
 class GameAPIView(generics.ListCreateAPIView):
     search_fields = ['name']
     filter_backends = (filters.SearchFilter,)
-    queryset = Game.objects.filter()
+    queryset = Game.objects.filter(is_deleted = False)
     serializer_class = GameSearchSerializer
 
-# select game.id, game.name, game.releaseDate, game.price, genre.name from game, game_genre, genre where game.id = game_genre.game_id and game_genre.genre_id = genre.id;
+
+class GameManAPIView(generics.ListCreateAPIView):
+    search_fields = ['managed_by']
+    filter_backends = (filters.SearchFilter,)
+    queryset = Game.objects.filter()
+    serializer_class = GameSearchSerializer
 
 
 class GenViewSet(viewsets.ModelViewSet):
@@ -169,6 +183,7 @@ class LogoutView(APIView):
 
 
 class CartView(APIView):
+    permission_classes = [IsExecutor]
     def post(self, request):
         serializer = CartSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
@@ -181,6 +196,7 @@ class CartViewSet(viewsets.ModelViewSet):
     API endpoint, который позволяет просматривать и редактировать акции компаний
     """
     # queryset всех пользователей для фильтрации по дате последнего изменения
+    permission_classes = [IsExecutor]
     search_fields = ['user_id__id']
     filter_backends = (filters.SearchFilter,)
     queryset = Cart.objects.all()
@@ -223,6 +239,8 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 class LibView(APIView):
+    permission_classes = [IsExecutor]
+
     def post(self, request):
         serializer = LibSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
@@ -235,6 +253,7 @@ class LibViewSet(viewsets.ModelViewSet):
     API endpoint, который позволяет просматривать и редактировать акции компаний
     """
     # queryset всех пользователей для фильтрации по дате последнего изменения
+    permission_classes = [IsExecutor]
     search_fields = ['user_id__id']
     filter_backends = (filters.SearchFilter,)
     queryset = Library.objects.all()

@@ -7,7 +7,7 @@ class GameSerializer(serializers.ModelSerializer):
         # Модель, которую мы сериализуем
         model = Game
         # Поля, которые мы сериализуем
-        fields = ["id", "name", "genre", "releasedate", "developer", "publisher", "price", "managed_by"]
+        fields = ["id", "name", "genre", "releasedate", "developer", "publisher", "price", "managed_by", "is_deleted"]
 
 
 class PubSerializer(serializers.ModelSerializer):
@@ -29,7 +29,7 @@ class DevSerializer(serializers.ModelSerializer):
 class GameSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
-        fields = ['id', "name", 'genre', "releasedate", "publisher", "developer",  "price", "managed_by"]
+        fields = ['id', "name", 'genre', "releasedate", "publisher", "developer",  "price", "managed_by", "is_deleted"]
 
 
 class GenSerializer(serializers.ModelSerializer):
@@ -74,7 +74,7 @@ class CartSerializer(serializers.ModelSerializer):
 class LibSerializer(serializers.ModelSerializer):
     class Meta:
         model = Library
-        fields = ['pk', 'user_id', 'game_id']
+        fields = '__all__'
 
 
 '''class RegistrationSerializer(serializers.ModelSerializer):
